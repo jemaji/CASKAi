@@ -35,21 +35,47 @@ curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bas
 
 # Windows (PowerShell):
 irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
-
-# O compilar desde fuente (requiere Go):
-go build -o ~/bin/caskai ./tools/caskai
 ```
 
 ## Comandos del engine
 ```bash
-caskai version                                          # verifica la instalación
-caskai validate                                         # gates: schema, degradación fail-closed
-caskai access    --manifest <consumidor>/caskai.yaml   # visibilidad por rol (audita)
-caskai build     --manifest <consumidor>/caskai.yaml --out <consumidor>/
-caskai inventory --consumers <dir-con-locks>            # trazabilidad de adopción (lee caskai.lock)
-caskai promote   --asset <pack>/assets/<sub> --to core
-python3 tools/codeowners-route.py <ficheros>            # qué owners exige CODEOWNERS
+caskai version                          # verifica la instalación
+caskai validate                         # gates: schema, degradación fail-closed
+caskai build                            # genera .claude/ y .github/ en el directorio actual
+caskai access                           # visibilidad por rol (audita)
+caskai inventory                        # trazabilidad de adopción (lee caskai.lock)
+caskai promote --asset <pack>/assets/<sub> --to core
+python3 tools/codeowners-route.py <ficheros>   # qué owners exige CODEOWNERS
 ```
+
+`caskai build` descarga los packs automáticamente desde el repo configurado en el binario
+(no requiere configuración en el consumidor). Desde la carpeta del consumidor basta con:
+```bash
+cd ~/mi-proyecto   # debe tener caskai.yaml
+caskai build
+```
+
+## Modo desarrollo (trabajando en este repo)
+
+Cuando modificas el engine o los packs localmente, usa `--root` para apuntar a tu copia
+en lugar de descargar desde GitHub:
+
+```bash
+# Compilar el engine con los últimos cambios locales:
+./dev.sh                          # recompila ~/bin/caskai desde tools/caskai/
+
+# Probar build apuntando a los packs locales (sin descargar de GitHub):
+cd ~/CODE/consumer-caskai
+caskai build --root ~/CODE/CASKAi
+
+# O con variable de entorno para no escribirlo en cada comando:
+export CASKAI_ROOT=~/CODE/CASKAi
+caskai build
+caskai validate
+caskai access
+```
+
+`--root` y `CASKAI_ROOT` son **solo para desarrollo**. Los consumidores reales no los usan.
 
 ## Antes de dar por bueno un cambio
 - Ejecuta `caskai validate` (debe pasar).
