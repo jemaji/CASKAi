@@ -65,7 +65,7 @@ ve tu código; el agente pide por tag."* **Sin control de acceso por rol. Sin te
 | Multi-tool Claude+Copilot | ✅ demostrado | ◐ vía plugins (Copilot a verificar) | ✅ |
 | Consumo selectivo por repo | ◐ (por fichero, 1 repo) | ◐ (3 capas runtime) | ✅ (manifiesto + packs versionados) |
 | Acceso por grupo Entra (C5) | ✗ | ✗ | ✅ (en build) |
-| Trazabilidad de uso (C6) | ✗ | ✗ | ✅ (ai.lock + inventory) |
+| Trazabilidad de uso (C6) | ✗ | ✗ | ✅ (caskai.lock + inventory) |
 | Perímetro / on-prem | ✅ (local) | ◐ (hospedado por defecto) | ✅ |
 | Gobernanza tiers / promoción a core | ✗ | ◐ (3 capas, sin RBAC) | ✅ |
 

@@ -42,7 +42,7 @@ de entorno `CASKAI_NO_TELEMETRY=1`.
 
 ---
 
-## [MEJ-003] `targets` en `ai.manifest.yaml` (consumidor declara herramientas objetivo)
+## [MEJ-003] `targets` en `caskai.yaml` (consumidor declara herramientas objetivo)
 
 **Contexto:** Actualmente los targets (claude/copilot) se declaran en el frontmatter de
 cada asset. El consumidor no puede restringir para qué herramientas quiere el build.
@@ -69,7 +69,7 @@ innecesarios. Control explícito y detección temprana de assets sin mapeo.
 **Contexto:** Actualmente la actualización de los ficheros generados en consumidores es manual.
 
 **Propuesta:** GitHub App que detecta nuevas versiones de packs en CASKAi y abre PRs
-automáticos en cada repo consumidor con los ficheros regenerados y el `ai.lock` actualizado.
+automáticos en cada repo consumidor con los ficheros regenerados y el `caskai.lock` actualizado.
 Idéntico al modelo Dependabot/Renovate.
 
 **Beneficio:** Elimina la fricción de actualización manual. Un cambio aprobado en CASKAi

@@ -403,7 +403,7 @@ func TestCmdValidate_SinPacks(t *testing.T) {
 func TestCmdBuild_PermisoInternal(t *testing.T) {
 	root := repoFixture(t)
 	out := t.TempDir()
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: [frontend-team]\npacks:\n  - core\n"), 0644)
 
 	code := cmdBuild(root, manifest, out)
@@ -414,16 +414,16 @@ func TestCmdBuild_PermisoInternal(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(out, "CLAUDE.md")); err != nil {
 		t.Error("CLAUDE.md no generado")
 	}
-	// ai.lock generado
-	if _, err := os.Stat(filepath.Join(out, "ai.lock")); err != nil {
-		t.Error("ai.lock no generado")
+	// caskai.lock generado
+	if _, err := os.Stat(filepath.Join(out, "caskai.lock")); err != nil {
+		t.Error("caskai.lock no generado")
 	}
 }
 
 func TestCmdBuild_PackRestrictedDenegado(t *testing.T) {
 	root := repoFixture(t)
 	out := t.TempDir()
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	// frontend-team no está en backend-guild → restricted pack denegado
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: [frontend-team]\npacks:\n  - restricted\n"), 0644)
 
@@ -440,7 +440,7 @@ func TestCmdBuild_PackRestrictedDenegado(t *testing.T) {
 func TestCmdBuild_PackRestrictedPermitido(t *testing.T) {
 	root := repoFixture(t)
 	out := t.TempDir()
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: [backend-guild]\npacks:\n  - restricted\n"), 0644)
 
 	code := cmdBuild(root, manifest, out)
@@ -455,7 +455,7 @@ func TestCmdBuild_PackRestrictedPermitido(t *testing.T) {
 func TestCmdBuild_GeneraCommands(t *testing.T) {
 	root := repoFixture(t)
 	out := t.TempDir()
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: [platform-core]\npacks:\n  - core\n"), 0644)
 
 	cmdBuild(root, manifest, out)
@@ -472,20 +472,20 @@ func TestCmdBuild_GeneraCommands(t *testing.T) {
 func TestCmdBuild_LockContienePack(t *testing.T) {
 	root := repoFixture(t)
 	out := t.TempDir()
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: []\npacks:\n  - core\n"), 0644)
 
 	cmdBuild(root, manifest, out)
-	lock, _ := os.ReadFile(filepath.Join(out, "ai.lock"))
+	lock, _ := os.ReadFile(filepath.Join(out, "caskai.lock"))
 	s := string(lock)
 	if !strings.Contains(s, "core") {
-		t.Error("ai.lock debe referenciar el pack core")
+		t.Error("caskai.lock debe referenciar el pack core")
 	}
 	if !strings.Contains(s, "engine:") {
-		t.Error("ai.lock debe incluir la versión del engine")
+		t.Error("caskai.lock debe incluir la versión del engine")
 	}
 	if !strings.Contains(s, "generated_at:") {
-		t.Error("ai.lock debe incluir la fecha de generación")
+		t.Error("caskai.lock debe incluir la fecha de generación")
 	}
 }
 
@@ -504,7 +504,7 @@ func TestCmdBuild_ManifiestNoExiste(t *testing.T) {
 
 func TestCmdAccess_OK(t *testing.T) {
 	root := repoFixture(t)
-	manifest := filepath.Join(t.TempDir(), "ai.manifest.yaml")
+	manifest := filepath.Join(t.TempDir(), "caskai.yaml")
 	os.WriteFile(manifest, []byte("channel: stable\nowner_groups: [backend-guild]\npacks:\n  - core\n  - restricted\n"), 0644)
 
 	code := cmdAccess(root, manifest)
@@ -530,12 +530,12 @@ func TestCmdInventory_ConLocks(t *testing.T) {
 	root := repoFixture(t)
 	consumersDir := t.TempDir()
 
-	// consumidor A con ai.lock
+	// consumidor A con caskai.lock
 	lockA := "channel: stable\ngroups: []\npacks:\n  core: \"0.1.0\"\nintegrity:\n  core: \"sha256:abc123\"\n"
-	mkFile(t, filepath.Join(consumersDir, "app-a", "ai.lock"), lockA)
+	mkFile(t, filepath.Join(consumersDir, "app-a", "caskai.lock"), lockA)
 
 	// consumidor B con misma versión
-	mkFile(t, filepath.Join(consumersDir, "app-b", "ai.lock"), lockA)
+	mkFile(t, filepath.Join(consumersDir, "app-b", "caskai.lock"), lockA)
 
 	code := cmdInventory(root, consumersDir)
 	if code != 0 {
@@ -548,9 +548,9 @@ func TestCmdInventory_DerivaDiagnosticada(t *testing.T) {
 	root := repoFixture(t)
 	consumersDir := t.TempDir()
 
-	mkFile(t, filepath.Join(consumersDir, "app-a", "ai.lock"),
+	mkFile(t, filepath.Join(consumersDir, "app-a", "caskai.lock"),
 		"channel: stable\ngroups: []\npacks:\n  core: \"0.1.0\"\nintegrity:\n  core: \"sha256:abc\"\n")
-	mkFile(t, filepath.Join(consumersDir, "app-b", "ai.lock"),
+	mkFile(t, filepath.Join(consumersDir, "app-b", "caskai.lock"),
 		"channel: stable\ngroups: []\npacks:\n  core: \"0.2.0\"\nintegrity:\n  core: \"sha256:def\"\n")
 
 	// inventory no falla ante deriva, solo la reporta

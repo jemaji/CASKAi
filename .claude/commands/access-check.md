@@ -1,6 +1,6 @@
 ---
 description: Comprueba qué packs puede consumir un consumidor según sus grupos de Entra
-argument-hint: "<ruta-al-ai.manifest.yaml>"
+argument-hint: "<ruta-al-caskai.yaml>"
 ---
 Comprueba la visibilidad por rol del manifiesto **$ARGUMENTS**:
 

@@ -11,10 +11,10 @@ Skills, Knowledge) servidos a Claude Code y GitHub Copilot. Este repo contiene *
 - **Adapters/emisión**: el engine (`caskai`) compila el formato canónico a `.claude/` y `.github/`
   con **adapters nativos en Go** (ADR-10); `rulesync` es propuesta de futuro (Fase 5), no se usa hoy.
   Nunca edites los ficheros generados de un consumidor: se regeneran.
-- **Distribución**: vendorizada (ficheros en cada repo) vía bot de PRs. Consumo declarado en `ai.manifest.yaml`.
+- **Distribución**: vendorizada (ficheros en cada repo) vía bot de PRs. Consumo declarado en `caskai.yaml`.
 
 ## Reglas de trabajo (importantes)
-1. **No edites ficheros generados** (`.claude/`, `.github/`, `ai.lock` en repos consumidores): se regeneran.
+1. **No edites ficheros generados** (`.claude/`, `.github/`, `caskai.lock` en repos consumidores): se regeneran.
 2. **Crear/editar packs** se hace en `packs/<pack>/assets/` en formato canónico. Todo asset lleva
    `id` (estable, global) y `type`. Todo pack lleva `owners`, `tier` y `access`.
 3. **Gobernanza por tiers**: `core` (board `@org/ai-governance`) · `domain` (owner del dominio) ·
@@ -44,9 +44,9 @@ go build -o ~/bin/caskai ./tools/caskai
 ```bash
 caskai version                                          # verifica la instalación
 caskai validate                                         # gates: schema, degradación fail-closed
-caskai access    --manifest <consumidor>/ai.manifest.yaml   # visibilidad por rol (audita)
-caskai build     --manifest <consumidor>/ai.manifest.yaml --out <consumidor>/
-caskai inventory --consumers <dir-con-locks>            # trazabilidad de adopción (lee ai.lock)
+caskai access    --manifest <consumidor>/caskai.yaml   # visibilidad por rol (audita)
+caskai build     --manifest <consumidor>/caskai.yaml --out <consumidor>/
+caskai inventory --consumers <dir-con-locks>            # trazabilidad de adopción (lee caskai.lock)
 caskai promote   --asset <pack>/assets/<sub> --to core
 python3 tools/codeowners-route.py <ficheros>            # qué owners exige CODEOWNERS
 ```

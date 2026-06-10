@@ -4,7 +4,7 @@
 //   validate    corre los gates sobre los packs (CI)
 //   build       compila canónico -> .claude/.github para un consumidor, con control de acceso por grupo
 //   access      muestra qué packs puede consumir un rol/grupo (visibilidad por rol), audita la decisión
-//   inventory   escanea los ai.lock de todos los consumidores -> trazabilidad 100% de uso
+//   inventory   escanea los caskai.lock de todos los consumidores -> trazabilidad 100% de uso
 //   promote     mueve un asset a un pack (p. ej. promoción de dominio -> core)
 package main
 
@@ -336,7 +336,7 @@ func cmdBuild(root, manifestPath, out string) int {
 	groups := strList(man["owner_groups"])
 	who := consumerName(manifestPath)
 	// limpia solo lo generado (nunca el repo del consumidor entero)
-	for _, g := range []string{".claude", ".github", "CLAUDE.md", "ai.lock"} {
+	for _, g := range []string{".claude", ".github", "CLAUDE.md", "caskai.lock"} {
 		os.RemoveAll(filepath.Join(out, g))
 	}
 	var claudeCtx, copilotCtx []string
@@ -383,8 +383,8 @@ func cmdBuild(root, manifestPath, out string) int {
 	if len(copilotCtx) > 0 {
 		mustWrite(filepath.Join(out, ".github/copilot-instructions.md"), strings.Join(copilotCtx, "\n\n"))
 	}
-	mustWrite(out+"/ai.lock", renderLock(asStr(man["channel"]), groups, lockPacks, lockHash, version))
-	fmt.Printf("  → ai.lock + artefactos en %s\n", out)
+	mustWrite(out+"/caskai.lock", renderLock(asStr(man["channel"]), groups, lockPacks, lockHash, version))
+	fmt.Printf("  → caskai.lock + artefactos en %s\n", out)
 	return 0
 }
 
@@ -443,7 +443,7 @@ func cmdInventory(root, consumersDir string) int {
 		if !e.IsDir() {
 			continue
 		}
-		lockPath := filepath.Join(consumersDir, e.Name(), "ai.lock")
+		lockPath := filepath.Join(consumersDir, e.Name(), "caskai.lock")
 		lock, err := loadYAML(lockPath)
 		if err != nil {
 			continue

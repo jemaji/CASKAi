@@ -10,9 +10,9 @@
 | Consumo no autorizado de un pack sensible | Autorización por grupos de Entra en distribución (§4, §5) |
 | Pack malicioso / con prompt-injection | Lint de seguridad en CI (gate 6) + releases firmados (§7) |
 | Modificación no autorizada de un pack | CODEOWNERS + branch protection (plano de escritura, §3) |
-| Manipulación en tránsito / suplantación de artefacto | Firmas + hashes de integridad en `ai.lock` (§7) |
+| Manipulación en tránsito / suplantación de artefacto | Firmas + hashes de integridad en `caskai.lock` (§7) |
 | Fuga de credenciales de CI | OIDC federation sin secretos (§6) |
-| Falta de trazabilidad | Auditoría: Entra sign-in + logs de API + inventario `ai.lock` (§8) |
+| Falta de trazabilidad | Auditoría: Entra sign-in + logs de API + inventario `caskai.lock` (§8) |
 
 ## 2. Principio rector: Entra como única fuente de identidad
 
@@ -73,7 +73,7 @@ pack.access  ────┤
 
 1. **Bot (push):** antes de abrir el PR a un repo, comprueba que el grupo dueño del repo está en `allowed_groups`. Si no, **no materializa** ese pack en ese repo.
    - Con team sync: `repo → GitHub Team → grupo Entra` es la fuente autoritativa.
-   - Sin team sync: el `ai.manifest` declara `owner_group` y el bot lo verifica contra Entra (Graph) / un registro central de `repo → owner_group` mantenido por la plataforma.
+   - Sin team sync: el `caskai.yaml` declara `owner_group` y el bot lo verifica contra Entra (Graph) / un registro central de `repo → owner_group` mantenido por la plataforma.
 2. **API de pull (on-demand / CLI / Action):** valida el token de Entra y comprueba `claims.groups ∩ allowed_groups`. Es el camino **más fuerte** y **no depende de team sync** → recomendado como vía principal para `restricted`/`confidential`.
 
 ## 6. Autenticación (sin secretos)
@@ -103,7 +103,7 @@ Los tokens de Entra omiten el claim `groups` si el usuario pertenece a demasiado
 
 Un pack comprometido es un vector real (exfiltración, prompt-injection). Defensas:
 - **Releases firmados** (cosign/sigstore o tags GPG firmados) en cada train.
-- **Hashes de integridad** en `ai.lock` (la POC ya los genera) → el consumidor verifica que recibe exactamente lo publicado.
+- **Hashes de integridad** en `caskai.lock` (la POC ya los genera) → el consumidor verifica que recibe exactamente lo publicado.
 - **Bot = GitHub App de mínimo privilegio**: abre PRs, **no** mergea ni administra.
 - **Gate 6 de CI**: lint de seguridad sobre `commands`/`skills` (secretos, comandos peligrosos, patrones de inyección).
 - **Verificación en consumo**: la Action/CLI valida firma + hash antes de escribir los ficheros.
@@ -113,7 +113,7 @@ Un pack comprometido es un vector real (exfiltración, prompt-injection). Defens
 Trazabilidad de "quién consumió/modificó qué y cuándo":
 - **Entra sign-in logs** → autenticaciones de pull.
 - **Logs de la API de distribución** → qué pack/versión se sirvió a quién.
-- **Inventario de `ai.lock`** (suma de todos los repos) → estado de adopción por versión.
+- **Inventario de `caskai.lock`** (suma de todos los repos) → estado de adopción por versión.
 - **Historial de PRs del monorepo** → cambios de autoría con revisor.
 
 ## 9. Componente nuevo: API de distribución
@@ -133,7 +133,7 @@ El enforcement de pull necesita un servicio ligero (validar token + servir packs
 ## 11. Fases de seguridad
 | Fase | Alcance de seguridad |
 |---|---|
-| 0–1 | CODEOWNERS + branch protection; clasificación `internal` por defecto; hashes en `ai.lock`. |
+| 0–1 | CODEOWNERS + branch protection; clasificación `internal` por defecto; hashes en `caskai.lock`. |
 | 2 | API de distribución + OIDC/MSAL; enforcement de `restricted` por grupos Entra. |
 | 3 | `confidential` con repos aislados; releases firmados; auditoría centralizada. |
 | 4 | Endurecimiento: rotación, alertas, revisión de group overage a escala. |

@@ -88,7 +88,7 @@ Dos capas de mapeo:
 **Decisión:** Los cambios se publican en ventanas fijas cada 2 semanas, con una **vía rápida (hotfix)** para seguridad y bugs críticos (doble aprobación).
 
 ### ADR-8 — Adopción vía lockfile + escaneo
-**Decisión:** Cada repo consumidor mantiene un `ai.lock` con `pack@versión` exactos. Un job escanea los repos de la organización y construye el inventario de adopción. Sin telemetría en runtime.
+**Decisión:** Cada repo consumidor mantiene un `caskai.lock` con `pack@versión` exactos. Un job escanea los repos de la organización y construye el inventario de adopción. Sin telemetría en runtime.
 
 ### ADR-9 — Distribución: bot de PRs + vendorizado de ambas herramientas
 **Decisión:** Un **bot estilo Renovate** abre PRs de actualización a cada repo consumidor cuando sale un train. Tanto los artefactos de **Claude** como los de **Copilot** se **vendorizan** (se commitean en el repo) por consistencia, aunque Claude soporte marketplace remoto.
@@ -285,8 +285,8 @@ Pipeline en cada PR al monorepo:
             a cada repo consumidor
                           ▼
               Repo consumidor:
-               - ai.manifest.yaml  (qué packs / canal)  ← mantenido a mano
-               - ai.lock           (versiones exactas)  ← generado, alimenta telemetría
+               - caskai.yaml  (qué packs / canal)  ← mantenido a mano
+               - caskai.lock           (versiones exactas)  ← generado, alimenta telemetría
                - .claude/          (vendorizado)        ← generado
                - .github/          (vendorizado)        ← generado
 ```
@@ -294,7 +294,7 @@ Pipeline en cada PR al monorepo:
 ### 8.2 Manifiesto por proyecto (única pieza manual)
 
 ```yaml
-# ai.manifest.yaml
+# caskai.yaml
 channel: stable
 packs:
   - core
@@ -303,9 +303,9 @@ packs:
 ```
 
 ### 8.3 Flujo de actualización
-1. Sale un train → el bot lee cada `ai.manifest`, regenera artefactos y abre PR.
+1. Sale un train → el bot lee cada `caskai.yaml`, regenera artefactos y abre PR.
 2. El equipo revisa el diff y mergea cuando quiere (respeta su autonomía).
-3. El `ai.lock` resultante alimenta el inventario de adopción.
+3. El `caskai.lock` resultante alimenta el inventario de adopción.
 
 ---
 
@@ -348,8 +348,8 @@ CASKAi/
 4.  Si breaking/core/seguridad/alto-impacto → RFC + board
 5.  Merge → espera ventana del train (o hotfix)
 6.  Release: semver + changelog + artefactos generados
-7.  Bot abre PRs a repos consumidores según ai.manifest
-8.  Equipos revisan diff y mergean → ai.lock actualizado
+7.  Bot abre PRs a repos consumidores según caskai.yaml
+8.  Equipos revisan diff y mergean → caskai.lock actualizado
 9.  Inventory escanea locks → telemetría de adopción
 10. Telemetría retroalimenta umbrales de RFC y deprecaciones seguras
 ```
@@ -362,7 +362,7 @@ CASKAi/
 |---|---|
 | **0 — Fundaciones** | Esquema canónico + JSON Schemas, repo scaffold, pack `core` mínimo, CODEOWNERS. |
 | **1 — Compilación** | Adapters Claude y Copilot, gates de CI 1-6, registro de degradación. |
-| **2 — Distribución** | `ai.manifest`/`ai.lock`, bot de PRs, vendorizado en consumidores piloto. |
+| **2 — Distribución** | `caskai.yaml`/`caskai.lock`, bot de PRs, vendorizado en consumidores piloto. |
 | **3 — Gobierno a escala** | Inventario de adopción, deprecation policy operativa, release trains formales. |
 | **4 — Calidad** | Evals automatizados (golden tests) en CI. |
 | **5 — Extensión** | Nuevas herramientas (Cursor, etc.) vía nuevos adapters nativos. **Punto de reevaluación de `rulesync`** (ADR-10): si los targets llegan a ~4+, valorar delegar la emisión en rulesync para no mantener un adapter por herramienta. |

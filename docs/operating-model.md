@@ -48,7 +48,7 @@ Los autores solo escriben el **formato canónico**. Los `.claude/` y `.github/` 
 Un consumidor crea **un único fichero**:
 
 ```yaml
-# ai.manifest.yaml — la única pieza que se mantiene a mano
+# caskai.yaml — la única pieza que se mantiene a mano
 channel: stable
 packs:
   - core
@@ -57,7 +57,7 @@ packs:
 
 Dos modos de materialización:
 
-- **Automático (recomendado):** el bot detecta el manifiesto y abre un PR con `.claude/`, `.github/` y `ai.lock` ya generados. El dev no instala nada.
+- **Automático (recomendado):** el bot detecta el manifiesto y abre un PR con `.claude/`, `.github/` y `caskai.lock` ya generados. El dev no instala nada.
 - **On-demand (local o CI):** instala el engine y ejecuta el build directamente:
   ```bash
   # Instalar el engine (una vez por máquina):
@@ -65,14 +65,14 @@ Dos modos de materialización:
   # Windows: irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
 
   # Generar los ficheros:
-  caskai build --root ~/CODE/CASKAi --manifest ai.manifest.yaml --out .
+  caskai build --root ~/CODE/CASKAi --manifest caskai.yaml --out .
   ```
 
 Resultado en el repo del consumidor:
 ```
 su-repo/
-├─ ai.manifest.yaml   ← a mano
-├─ ai.lock            ← generado (versiones exactas + integridad)
+├─ caskai.yaml   ← a mano
+├─ caskai.lock            ← generado (versiones exactas + integridad)
 ├─ .claude/           ← generado (lo usa Claude Code)
 └─ .github/           ← generado (lo usa Copilot)
 ```
@@ -85,12 +85,12 @@ su-repo/
 Sale el release train quincenal (core 0.1.0 → 0.2.0)
    │
    ▼
-El bot recorre TODOS los repos con ai.manifest
+El bot recorre TODOS los repos con caskai.yaml
    │  por cada uno: lee manifiesto → regenera artefactos → calcula diff
    ▼
 Abre un PR por repo: "chore(ai): actualizar core 0.1.0 → 0.2.0"
    ├─ diff de .claude/ y .github/
-   ├─ cambio en ai.lock
+   ├─ cambio en caskai.lock
    └─ resumen del changelog
    ▼
 El equipo del repo revisa y mergea CUANDO QUIERE   ← autonomía
@@ -128,12 +128,12 @@ El bot lo propaga a TODOS los consumidores de ese pack
 Asset marcado: deprecated_in 0.3.0, removed_in 0.5.0
    ▼
 El bot/CI avisa SOLO a quien aún lo usa
-   (cruzando todos los ai.lock = inventario de adopción)
+   (cruzando todos los caskai.lock = inventario de adopción)
    ▼
 Ventana de soporte (p. ej. 2 trains) → eliminación
 ```
 
-Deprecación **con datos**: la suma de todos los `ai.lock` dice quién usa qué versión.
+Deprecación **con datos**: la suma de todos los `caskai.lock` dice quién usa qué versión.
 
 ---
 

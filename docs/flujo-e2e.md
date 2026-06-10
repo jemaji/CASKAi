@@ -85,7 +85,7 @@ incluye `secure-logging` (ver `governance/rfcs/0001-promote-secure-logging-to-co
 `data-platform` (que solo consume `core`):
 
 ```
-$ caskai build --manifest consumers/data-platform/ai.manifest.yaml --out consumers/data-platform
+$ caskai build --manifest consumers/data-platform/caskai.yaml --out consumers/data-platform
   ✓ core@0.2.0 [internal] PERMITIDO
 .github/instructions: coding-conventions.instructions.md  secure-logging.instructions.md   ← nuevo
 ```
@@ -107,11 +107,11 @@ Cada pack declara su `access` en `pack.yaml`. El engine **deniega en fail-closed
 **audita** cada decisión. Dos consumidores con distinto grupo de Entra:
 
 ```
-$ caskai access --manifest consumers/example-app/ai.manifest.yaml   # grupo platform-core
+$ caskai access --manifest consumers/example-app/caskai.yaml   # grupo platform-core
   🔒 backend-python   restricted     DENEGADO
   ✓  core             internal       PERMITIDO
 
-$ caskai access --manifest consumers/payments-api/ai.manifest.yaml  # grupo backend-guild
+$ caskai access --manifest consumers/payments-api/caskai.yaml  # grupo backend-guild
   ✓  backend-python   restricted     PERMITIDO
   ✓  core             internal       PERMITIDO
 ```
@@ -119,7 +119,7 @@ $ caskai access --manifest consumers/payments-api/ai.manifest.yaml  # grupo back
 En el `build`, lo denegado **no se materializa** (no llega ni un fichero):
 
 ```
-$ caskai build --manifest consumers/example-app/ai.manifest.yaml --out consumers/example-app
+$ caskai build --manifest consumers/example-app/caskai.yaml --out consumers/example-app
   ✓ core@0.1.0 [internal] PERMITIDO
   🔒 backend-python [restricted] DENEGADO (requiere [backend-guild]) — no se materializa
 ```
@@ -136,7 +136,7 @@ Cada decisión queda en `governance/audit.log` (JSON line, auditable):
 
 ## 4. Trazabilidad 100% del uso
 
-Cada consumidor lleva un `ai.lock` vendorizado (pack@versión + hash de integridad).
+Cada consumidor lleva un `caskai.lock` vendorizado (pack@versión + hash de integridad).
 El engine los escanea y produce el inventario de adopción:
 
 ```
@@ -163,8 +163,8 @@ curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bas
 
 # 2. Ejecutar los gates y flujos
 caskai validate
-caskai access    --manifest <consumidor>/ai.manifest.yaml
-caskai build     --manifest <consumidor>/ai.manifest.yaml --out <consumidor>/
+caskai access    --manifest <consumidor>/caskai.yaml
+caskai build     --manifest <consumidor>/caskai.yaml --out <consumidor>/
 caskai inventory --consumers <dir-con-locks>
 ```
 
@@ -174,4 +174,4 @@ caskai inventory --consumers <dir-con-locks>
 | Promoción a core (board) | §2 (CODEOWNERS @ai-governance + RFC-0001 + core 0.2.0) |
 | Dónde entra Go y cómo | §0 + `tools/caskai/` (binario único, CI/bot/local) |
 | Seguridad y visibilidad por rol | §3 (access fail-closed + audit.log) |
-| Trazabilidad 100% del uso | §4 (`ai.lock` + `caskai inventory`) |
+| Trazabilidad 100% del uso | §4 (`caskai.lock` + `caskai inventory`) |

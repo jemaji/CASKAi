@@ -50,8 +50,8 @@ El script detecta OS y arquitectura automáticamente y descarga el binario corre
 caskai version                                                        # verifica la instalación
 
 caskai validate                                                       # gate de CI sobre todos los packs
-caskai access    --manifest ai.manifest.yaml                          # visibilidad por rol
-caskai build     --manifest ai.manifest.yaml --out .                  # genera .claude/ y .github/
+caskai access    --manifest caskai.yaml                          # visibilidad por rol
+caskai build     --manifest caskai.yaml --out .                  # genera .claude/ y .github/
 caskai inventory --consumers /ruta/a/consumers                        # trazabilidad de adopción
 caskai promote   --asset backend-python/assets/context/x.md --to core # promoción a core
 ```
