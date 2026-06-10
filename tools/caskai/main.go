@@ -504,9 +504,12 @@ func cmdPromote(root, assetRel, toPack string) int {
 }
 
 func main() {
+	// root: 1) flag --root  2) $CASKAI_ROOT  3) directorio actual
 	root := "."
+	if r := os.Getenv("CASKAI_ROOT"); r != "" {
+		root = r
+	}
 	args := os.Args[1:]
-	// flag --root
 	var rest []string
 	for i := 0; i < len(args); i++ {
 		if args[i] == "--root" && i+1 < len(args) {
@@ -520,25 +523,33 @@ func main() {
 		fmt.Printf(`caskai %s — CASKAi engine
 
 Uso:
-  caskai [--root <dir>] <comando> [opciones]
+  caskai <comando> [opciones]
 
 Comandos:
-  validate                          Valida todos los packs (gates de CI: schema, degradación fail-closed)
-  build    --manifest <f> --out <d> Compila assets canónicos → .claude/ y .github/ para un consumidor
-  access   --manifest <f>           Muestra qué packs puede ver un consumidor según sus grupos (audita)
-  inventory --consumers <dir>       Escanea caskai.lock de todos los consumidores → trazabilidad de uso
-  promote  --asset <ruta> --to core Mueve un asset a otro pack (p. ej. domain → core)
-  version                           Muestra la versión del engine
-  help                              Muestra esta ayuda
+  validate                  Valida todos los packs (gates de CI: schema, degradación fail-closed)
+  build                     Compila assets canónicos → .claude/ y .github/ para el consumidor actual
+  access                    Muestra qué packs puede ver el consumidor actual según sus grupos (audita)
+  inventory                 Escanea caskai.lock de todos los consumidores → trazabilidad de uso
+  promote  --asset <ruta>   Mueve un asset a otro pack (p. ej. domain → core)
+  version                   Muestra la versión del engine
+  help                      Muestra esta ayuda
 
-Flags globales:
-  --root <dir>   Ruta al repositorio CASKAi (por defecto: directorio actual)
+Opciones de build/access:
+  --manifest <f>   Manifiesto del consumidor (por defecto: ./caskai.yaml)
+  --out <dir>      Directorio de salida      (por defecto: directorio actual)
 
-Ejemplos:
-  caskai validate
-  caskai build --manifest ~/consumer/caskai.yaml --out ~/consumer
-  caskai access --manifest ~/consumer/caskai.yaml
-  caskai inventory --consumers ~/consumers
+Variable de entorno:
+  CASKAI_ROOT   Ruta al repositorio CASKAi (requerida para build/access/validate/promote)
+                Añádela a tu shell: export CASKAI_ROOT=~/CODE/CASKAi
+
+Uso típico (desde la carpeta del consumidor):
+  cd ~/mi-proyecto
+  caskai build          # usa ./caskai.yaml y genera en .
+  caskai access         # audita visibilidad de packs
+  caskai validate       # valida desde CASKAI_ROOT
+
+Otros ejemplos:
+  caskai inventory
   caskai promote --asset backend-python/assets/context/x.md --to core
 `, version)
 	}
@@ -546,6 +557,7 @@ Ejemplos:
 		printHelp()
 		os.Exit(2)
 	}
+	cwd, _ := os.Getwd()
 	flag := func(name, def string) string {
 		for i := 0; i < len(rest)-1; i++ {
 			if rest[i] == name {
@@ -558,9 +570,9 @@ Ejemplos:
 	case "validate":
 		os.Exit(cmdValidate(root))
 	case "build":
-		os.Exit(cmdBuild(root, flag("--manifest", ""), flag("--out", "dist/out")))
+		os.Exit(cmdBuild(root, flag("--manifest", filepath.Join(cwd, "caskai.yaml")), flag("--out", cwd)))
 	case "access":
-		os.Exit(cmdAccess(root, flag("--manifest", "")))
+		os.Exit(cmdAccess(root, flag("--manifest", filepath.Join(cwd, "caskai.yaml"))))
 	case "inventory":
 		os.Exit(cmdInventory(root, flag("--consumers", filepath.Join(root, "consumers"))))
 	case "promote":

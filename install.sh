@@ -117,9 +117,19 @@ if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
   fi
 fi
 
+# ── recordatorio CASKAI_ROOT ─────────────────────────────────
 echo ""
 echo "──────────────────────────────────────────────"
-echo "  Si 'caskai' no responde en este terminal,"
-echo "  ejecuta:  source ${PROFILE:-~/.zshrc}"
-echo "  o abre un terminal nuevo."
+echo "  ✅ caskai instalado correctamente."
+echo ""
+echo "  Paso siguiente: define CASKAI_ROOT en tu perfil"
+echo "  para que caskai sepa dónde están los packs:"
+echo ""
+echo "    export CASKAI_ROOT=~/CODE/CASKAi   # ajusta la ruta"
+echo ""
+echo "  Luego, desde cualquier consumidor basta con:"
+echo "    cd ~/mi-proyecto && caskai build"
+echo ""
+echo "  Si 'caskai' no responde aún en este terminal:"
+echo "    source ${PROFILE:-~/.zshrc}"
 echo "──────────────────────────────────────────────"
