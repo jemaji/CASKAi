@@ -14,14 +14,53 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 )
 
-// version es sobreescrita en build release vía -ldflags "-X main.version=vX.Y.Z"
-var version = "dev"
+// version y sourceRepo son sobreescritas en build release vía -ldflags
+var version    = "dev"
+var sourceRepo = "https://github.com/jemaji/CASKAi"
+
+// resolveRoot devuelve la ruta al repo de packs:
+//  1. flag --root (ya extraído por main)
+//  2. $CASKAI_ROOT
+//  3. clonar/actualizar sourceRepo en ~/.caskai/cache/
+func resolveRoot(explicit string) string {
+	if explicit != "" {
+		return explicit
+	}
+	if r := os.Getenv("CASKAI_ROOT"); r != "" {
+		return r
+	}
+	cache := filepath.Join(os.Getenv("HOME"), ".caskai", "cache", "repo")
+	if _, err := os.Stat(filepath.Join(cache, "packs")); err == nil {
+		// ya existe — pull para actualizar
+		fmt.Println("▶ Actualizando packs desde", sourceRepo)
+		cmd := exec.Command("git", "-C", cache, "pull", "--ff-only", "--quiet")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		_ = cmd.Run()
+	} else {
+		// primera vez — clonar
+		fmt.Println("▶ Descargando packs desde", sourceRepo)
+		if err := os.MkdirAll(filepath.Dir(cache), 0755); err != nil {
+			fmt.Println("error creando caché:", err)
+			os.Exit(1)
+		}
+		cmd := exec.Command("git", "clone", "--depth", "1", sourceRepo, cache)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			fmt.Println("error clonando repo de packs:", err)
+			os.Exit(1)
+		}
+	}
+	return cache
+}
 
 var native = map[string]map[string]bool{
 	"claude":  {"context": true, "command": true, "agent": true, "skill": true},
@@ -504,16 +543,13 @@ func cmdPromote(root, assetRel, toPack string) int {
 }
 
 func main() {
-	// root: 1) flag --root  2) $CASKAI_ROOT  3) directorio actual
-	root := "."
-	if r := os.Getenv("CASKAI_ROOT"); r != "" {
-		root = r
-	}
+	// extraer --root explícito si lo hay (dev/override)
+	var explicitRoot string
 	args := os.Args[1:]
 	var rest []string
 	for i := 0; i < len(args); i++ {
 		if args[i] == "--root" && i+1 < len(args) {
-			root = args[i+1]
+			explicitRoot = args[i+1]
 			i++
 		} else {
 			rest = append(rest, args[i])
@@ -521,13 +557,14 @@ func main() {
 	}
 	printHelp := func() {
 		fmt.Printf(`caskai %s — CASKAi engine
+Repo de packs: %s
 
 Uso:
   caskai <comando> [opciones]
 
 Comandos:
   validate                  Valida todos los packs (gates de CI: schema, degradación fail-closed)
-  build                     Compila assets canónicos → .claude/ y .github/ para el consumidor actual
+  build                     Compila assets → .claude/ y .github/ para el consumidor actual
   access                    Muestra qué packs puede ver el consumidor actual según sus grupos (audita)
   inventory                 Escanea caskai.lock de todos los consumidores → trazabilidad de uso
   promote  --asset <ruta>   Mueve un asset a otro pack (p. ej. domain → core)
@@ -538,20 +575,15 @@ Opciones de build/access:
   --manifest <f>   Manifiesto del consumidor (por defecto: ./caskai.yaml)
   --out <dir>      Directorio de salida      (por defecto: directorio actual)
 
-Variable de entorno:
-  CASKAI_ROOT   Ruta al repositorio CASKAi (requerida para build/access/validate/promote)
-                Añádela a tu shell: export CASKAI_ROOT=~/CODE/CASKAi
+Overrides (solo para desarrollo local):
+  --root <dir>     Usa este directorio como repo de packs en lugar de descargarlo
+  CASKAI_ROOT      Variable de entorno equivalente a --root
 
 Uso típico (desde la carpeta del consumidor):
   cd ~/mi-proyecto
-  caskai build          # usa ./caskai.yaml y genera en .
-  caskai access         # audita visibilidad de packs
-  caskai validate       # valida desde CASKAI_ROOT
-
-Otros ejemplos:
-  caskai inventory
-  caskai promote --asset backend-python/assets/context/x.md --to core
-`, version)
+  caskai build     # descarga packs automáticamente si es necesario
+  caskai access    # audita visibilidad de packs
+`, version, sourceRepo)
 	}
 	if len(rest) == 0 {
 		printHelp()
@@ -568,15 +600,16 @@ Otros ejemplos:
 	}
 	switch rest[0] {
 	case "validate":
-		os.Exit(cmdValidate(root))
+		os.Exit(cmdValidate(resolveRoot(explicitRoot)))
 	case "build":
-		os.Exit(cmdBuild(root, flag("--manifest", filepath.Join(cwd, "caskai.yaml")), flag("--out", cwd)))
+		os.Exit(cmdBuild(resolveRoot(explicitRoot), flag("--manifest", filepath.Join(cwd, "caskai.yaml")), flag("--out", cwd)))
 	case "access":
-		os.Exit(cmdAccess(root, flag("--manifest", filepath.Join(cwd, "caskai.yaml"))))
+		os.Exit(cmdAccess(resolveRoot(explicitRoot), flag("--manifest", filepath.Join(cwd, "caskai.yaml"))))
 	case "inventory":
+		root := resolveRoot(explicitRoot)
 		os.Exit(cmdInventory(root, flag("--consumers", filepath.Join(root, "consumers"))))
 	case "promote":
-		os.Exit(cmdPromote(root, flag("--asset", ""), flag("--to", "core")))
+		os.Exit(cmdPromote(resolveRoot(explicitRoot), flag("--asset", ""), flag("--to", "core")))
 	case "version":
 		fmt.Printf("caskai %s\n", version)
 	case "help", "--help", "-h":

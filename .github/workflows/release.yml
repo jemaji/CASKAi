@@ -52,7 +52,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
         run: |
-          go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" \
+          go build -ldflags="-s -w -X main.version=${{ github.ref_name }} -X main.sourceRepo=https://github.com/${{ github.repository }}" \
             -o dist/${{ steps.name.outputs.binary }} \
             ./tools/caskai
 
