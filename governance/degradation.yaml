@@ -1,0 +1,8 @@
+# Reglas de degradación por TIPO, auditadas por gobernanza.
+# Clave: "<tipo>-><target>". Aplica cuando un asset apunta a una herramienta
+# que no soporta su tipo de forma nativa y no define un override por-asset.
+"skill->copilot":
+  strategy: prompt        # prompt | instructions | composite | skip
+  approved_by: "@org/ai-governance"
+  approved_at: "2026-06-05"
+  note: "Las skills no tienen equivalente nativo en Copilot; se emiten como prompt files (sin recursos)."

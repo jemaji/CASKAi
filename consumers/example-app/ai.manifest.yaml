@@ -1,0 +1,9 @@
+# Manifiesto del consumidor (única pieza a mano).
+# owner_groups: grupos de Entra del equipo dueño del repo (en prod, vía team sync;
+# aquí se declaran y el bot/API los verifica contra el token de Entra).
+channel: stable
+owner_groups:
+  - platform-core
+packs:
+  - core
+  - backend-python     # restricted → este consumidor NO está en backend-guild ⇒ será DENEGADO

@@ -1,0 +1,11 @@
+name: backend-python
+version: 0.1.0
+tier: domain
+description: "Convenciones y utilidades para servicios backend en Python."
+owners: ["@org/backend-guild"]
+targets: [claude, copilot]
+channels: [stable]
+access:
+  classification: restricted        # solo grupos autorizados pueden consumirlo
+  allowed_groups:
+    - backend-guild

@@ -1,0 +1,20 @@
+# build / binarios
+bin/
+dist/
+__pycache__/
+*.pyc
+
+# runtime
+governance/audit.log
+
+# artefactos generados en repos consumidores (los regenera el engine/bot)
+consumers/*/.claude/
+consumers/*/.github/
+consumers/*/CLAUDE.md
+consumers/*/ai.lock
+
+# spikes / evaluación
+spike/
+
+# varios
+.DS_Store

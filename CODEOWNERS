@@ -1,0 +1,15 @@
+# Enrutado de revisión por tier/dominio (GitHub Teams sincronizados desde Entra ID).
+# Regla de GitHub: GANA EL ÚLTIMO patrón que casa → lo específico va al final.
+
+# Fallback: cualquier pack sin dueño específico requiere gobernanza
+/packs/                     @org/ai-governance
+
+# Zonas de gobernanza / plataforma
+/packs/core/                @org/ai-governance
+/governance/                @org/ai-governance
+/adapters/                  @org/ai-governance
+/tools/                     @org/ai-platform-eng
+
+# Packs de dominio (su owner aprueba) — al final para que gane sobre el fallback
+/packs/backend-python/      @org/backend-guild
+/packs/frontend-react/      @org/frontend-guild

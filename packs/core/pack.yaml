@@ -1,0 +1,9 @@
+name: core
+version: 0.2.0
+tier: core
+description: "Convenciones y utilidades base que heredan todos los proyectos."
+owners: ["@org/ai-governance"]
+targets: [claude, copilot]
+channels: [stable]
+access:
+  classification: internal      # lo hereda toda la ingeniería
