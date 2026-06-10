@@ -41,10 +41,12 @@ $Version = & $Dest version
 Write-Host "✅ Instalado: $Version" -ForegroundColor Green
 Write-Host "   → $Dest"
 
-# ── aviso si el directorio no está en PATH ───────────────────
+# ── añadir al PATH de usuario si no está ya ──────────────────
 $UserPath = [Environment]::GetEnvironmentVariable("PATH", "User")
 if ($UserPath -notlike "*$InstallDir*") {
-    Write-Host ""
-    Write-Host "⚠️  Añade $InstallDir al PATH para usar 'caskai' directamente:" -ForegroundColor Yellow
-    Write-Host "   [Environment]::SetEnvironmentVariable('PATH', `"`$env:PATH;$InstallDir`", 'User')"
+    $NewPath = if ($UserPath) { "$UserPath;$InstallDir" } else { $InstallDir }
+    [Environment]::SetEnvironmentVariable("PATH", $NewPath, "User")
+    Write-Host "✅ PATH actualizado (sesión actual + futuras sesiones)" -ForegroundColor Green
+    # aplicar también en la sesión actual
+    $env:PATH = "$env:PATH;$InstallDir"
 }

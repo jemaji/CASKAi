@@ -56,9 +56,30 @@ VERSION="$("${INSTALL_DIR}/${BIN_NAME}" version 2>&1)"
 echo "✅ Instalado: ${VERSION}"
 echo "   → ${INSTALL_DIR}/${BIN_NAME}"
 
-# ── aviso si el directorio no está en PATH ───────────────────
+# ── añadir al PATH si no está ya ─────────────────────────────
 if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
-  echo ""
-  echo "⚠️  Añade esto a tu ~/.zshrc o ~/.bashrc para usar 'caskai' directamente:"
-  echo "   export PATH=\"\$HOME/bin:\$PATH\""
+  EXPORT_LINE="export PATH=\"\$HOME/bin:\$PATH\""
+
+  # detectar el shell y el fichero de perfil correcto
+  PROFILE=""
+  if [[ "$SHELL" == */zsh ]]; then
+    PROFILE="$HOME/.zshrc"
+  elif [[ "$SHELL" == */bash ]]; then
+    PROFILE="${BASH_PROFILE:-$HOME/.bashrc}"
+    [[ "$GOOS" == "darwin" ]] && PROFILE="$HOME/.bash_profile"
+  fi
+
+  if [[ -n "$PROFILE" ]]; then
+    # solo añadir si la línea no existe ya en el fichero
+    if ! grep -qF "$INSTALL_DIR" "$PROFILE" 2>/dev/null; then
+      echo "" >> "$PROFILE"
+      echo "# caskai (CASKAi engine)" >> "$PROFILE"
+      echo "$EXPORT_LINE" >> "$PROFILE"
+      echo "✅ PATH actualizado en $PROFILE"
+      echo "   Ejecuta: source $PROFILE  (o abre un terminal nuevo)"
+    fi
+  else
+    echo "⚠️  No se pudo detectar el perfil del shell. Añade manualmente a tu perfil:"
+    echo "   $EXPORT_LINE"
+  fi
 fi
