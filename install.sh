@@ -88,3 +88,10 @@ if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
     echo "   $EXPORT_LINE"
   fi
 fi
+
+echo ""
+echo "──────────────────────────────────────────────"
+echo "  Si 'caskai' no responde en este terminal,"
+echo "  ejecuta:  source ${PROFILE:-~/.zshrc}"
+echo "  o abre un terminal nuevo."
+echo "──────────────────────────────────────────────"
