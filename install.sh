@@ -75,10 +75,15 @@ if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
       echo "" >> "$PROFILE"
       echo "# caskai (CASKAi engine)" >> "$PROFILE"
       echo "$EXPORT_LINE" >> "$PROFILE"
-      echo "✅ PATH actualizado en $PROFILE"
-      echo "   Ejecuta: source $PROFILE  (o abre un terminal nuevo)"
     fi
+    # aplicar en la sesión actual y hacer source del perfil
+    export PATH="$INSTALL_DIR:$PATH"
+    # shellcheck disable=SC1090
+    source "$PROFILE" 2>/dev/null || true
+    echo "✅ PATH actualizado en $PROFILE y aplicado en la sesión actual"
   else
+    # sin perfil detectado: al menos aplicar en la sesión actual
+    export PATH="$INSTALL_DIR:$PATH"
     echo "⚠️  No se pudo detectar el perfil del shell. Añade manualmente a tu perfil:"
     echo "   $EXPORT_LINE"
   fi
