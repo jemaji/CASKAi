@@ -14,7 +14,7 @@ Skills, Knowledge) servidos a Claude Code y GitHub Copilot. Este repo contiene *
 - **Distribución**: vendorizada (ficheros en cada repo) vía bot de PRs. Consumo declarado en `ai.manifest.yaml`.
 
 ## Reglas de trabajo (importantes)
-1. **No edites ficheros generados** (`.claude/`, `.github/`, `ai.lock` dentro de `consumers/`): se regeneran.
+1. **No edites ficheros generados** (`.claude/`, `.github/`, `ai.lock` en repos consumidores): se regeneran.
 2. **Crear/editar packs** se hace en `packs/<pack>/assets/` en formato canónico. Todo asset lleva
    `id` (estable, global) y `type`. Todo pack lleva `owners`, `tier` y `access`.
 3. **Gobernanza por tiers**: `core` (board `@org/ai-governance`) · `domain` (owner del dominio) ·
@@ -28,19 +28,31 @@ Skills, Knowledge) servidos a Claude Code y GitHub Copilot. Este repo contiene *
    y `allowed_groups` (grupos de Entra). Nunca metas secretos/PII en un asset.
 7. **Versionado por pack** (semver). Promocionar un asset a `core` sube la versión de `core` y exige RFC.
 
+## Instalación del engine
+```bash
+# Mac / Linux (auto-detecta OS y arquitectura):
+curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+
+# Windows (PowerShell):
+irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
+
+# O compilar desde fuente (requiere Go):
+go build -o ~/bin/caskai ./tools/caskai
+```
+
 ## Comandos del engine
 ```bash
-go build -o bin/caskai ./tools/caskai
-./bin/caskai validate                      # gates: schema, degradación fail-closed
-./bin/caskai access    --manifest consumers/<c>/ai.manifest.yaml   # visibilidad por rol (audita)
-./bin/caskai build     --manifest consumers/<c>/ai.manifest.yaml --out consumers/<c>
-./bin/caskai inventory                     # trazabilidad de adopción (lee ai.lock)
-./bin/caskai promote   --asset <pack>/assets/<sub> --to core
-python3 tools/codeowners-route.py <ficheros>   # qué owners exige CODEOWNERS
+caskai version                                          # verifica la instalación
+caskai validate                                         # gates: schema, degradación fail-closed
+caskai access    --manifest <consumidor>/ai.manifest.yaml   # visibilidad por rol (audita)
+caskai build     --manifest <consumidor>/ai.manifest.yaml --out <consumidor>/
+caskai inventory --consumers <dir-con-locks>            # trazabilidad de adopción (lee ai.lock)
+caskai promote   --asset <pack>/assets/<sub> --to core
+python3 tools/codeowners-route.py <ficheros>            # qué owners exige CODEOWNERS
 ```
 
 ## Antes de dar por bueno un cambio
-- Ejecuta `./bin/caskai validate` (debe pasar).
+- Ejecuta `caskai validate` (debe pasar).
 - Si tocaste `packs/core/` o hiciste un cambio incompatible/seguridad → recuerda el **RFC** y el routing a `@org/ai-governance`.
 - Mantén el estilo del código y de los assets que te rodean.
 

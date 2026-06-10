@@ -1,7 +1,8 @@
 ---
 description: Muestra la trazabilidad de adopción (quién usa qué pack y versión) y detecta deriva
+argument-hint: "<directorio-con-ai.lock>"
 ---
-Ejecuta `./bin/caskai inventory` y resume:
+Ejecuta `caskai inventory --consumers $ARGUMENTS` y resume:
 
 - Qué packs y versiones están en uso y por qué consumidores.
 - **Deriva de versión** (mismo pack en varias versiones) → candidatos a PR de actualización por el bot.

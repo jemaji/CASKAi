@@ -24,21 +24,36 @@ CASKAi/
 │  └─ <pack>/pack.yaml + assets/{context,commands,agents,skills}/
 ├─ tools/caskai/       # engine en Go (binario único `caskai`)
 ├─ governance/         # architecture.md (ADRs), degradation.yaml, rfcs/
-├─ consumers/          # manifiestos de ejemplo (ai.manifest.yaml)
 ├─ docs/               # operating-model, security, spike, flujo-e2e…
 ├─ .claude/            # agentización del propio repo (agents, commands, skills)
+├─ install.sh          # instalador Mac/Linux (auto-detecta OS/arch)
+├─ install.ps1         # instalador Windows (PowerShell)
 └─ CODEOWNERS
 ```
 
+## Instalación del engine
+
+**Mac / Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
+```
+
+El script detecta OS y arquitectura automáticamente y descarga el binario correcto de la release más reciente. Los binarios están publicados en [Releases](https://github.com/jemaji/CASKAi/releases) para: `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`, `windows/amd64`.
+
 ## Quickstart
 ```bash
-go build -o bin/caskai ./tools/caskai      # compila el engine (binario único, sin deps)
+caskai version                                                        # verifica la instalación
 
-./bin/caskai validate                       # gate de CI sobre todos los packs
-./bin/caskai access    --manifest consumers/payments-api/ai.manifest.yaml   # visibilidad por rol
-./bin/caskai build     --manifest consumers/payments-api/ai.manifest.yaml --out consumers/payments-api
-./bin/caskai inventory                       # trazabilidad de adopción
-./bin/caskai promote   --asset backend-python/assets/context/x.md --to core # promoción a core
+caskai validate                                                       # gate de CI sobre todos los packs
+caskai access    --manifest ai.manifest.yaml                          # visibilidad por rol
+caskai build     --manifest ai.manifest.yaml --out .                  # genera .claude/ y .github/
+caskai inventory --consumers /ruta/a/consumers                        # trazabilidad de adopción
+caskai promote   --asset backend-python/assets/context/x.md --to core # promoción a core
 ```
 
 ## Decisiones clave

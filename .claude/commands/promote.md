@@ -6,10 +6,10 @@ Promociona el asset **$ARGUMENTS** a `core`. Es un cambio de tier que **requiere
 del board** (`@org/ai-governance`).
 
 Pasos:
-1. `./bin/caskai promote --asset $ARGUMENTS --to core`
+1. `caskai promote --asset $ARGUMENTS --to core`
 2. Sube la versión de `packs/core/pack.yaml` (semver minor) y crea un RFC en
    `governance/rfcs/NNNN-<slug>.md` (contexto, propuesta, decisión, aprobador = board).
-3. `./bin/caskai validate`.
+3. `caskai validate`.
 4. Muestra el routing del PR (`python3 tools/codeowners-route.py $(git diff --name-only)`),
    que debe exigir `@org/ai-governance` por tocar `packs/core/`.
 

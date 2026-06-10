@@ -58,11 +58,14 @@ packs:
 Dos modos de materialización:
 
 - **Automático (recomendado):** el bot detecta el manifiesto y abre un PR con `.claude/`, `.github/` y `ai.lock` ya generados. El dev no instala nada.
-- **On-demand (opcional):** GitHub Action o binario local para sincronizar al momento:
-  ```yaml
-  # .github/workflows/ai-sync.yml
-  - uses: org/CASKAi-action@v1
-    with: { manifest: ai.manifest.yaml }
+- **On-demand (local o CI):** instala el engine y ejecuta el build directamente:
+  ```bash
+  # Instalar el engine (una vez por máquina):
+  curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+  # Windows: irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
+
+  # Generar los ficheros:
+  caskai build --root ~/CODE/CASKAi --manifest ai.manifest.yaml --out .
   ```
 
 Resultado en el repo del consumidor:

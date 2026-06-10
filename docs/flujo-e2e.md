@@ -1,24 +1,32 @@
 # Flujo end-to-end (ejecutable) — de owner a core, con Go, seguridad por rol y trazabilidad
 
 > Este recorrido **se ejecuta de verdad** sobre el repo. El engine es el binario Go
-> `bin/caskai` (compilado, sin dependencias). Reproduce: creación de un pack por un
+> `caskai` (sin dependencias, descargable en un comando). Reproduce: creación de un pack por un
 > owner, aprobación de gobernanza, promoción a `core`, control de acceso por grupo de
 > Entra y trazabilidad 100% del uso.
 
 ## 0. El engine: dónde entra Go y cómo
 
 `caskai` es el **engine de la plataforma**, escrito en Go y compilado a **un único
-binario de ~3 MB sin dependencias**. Es lo que corre:
+binario sin dependencias**. Es lo que corre:
 - en **CI** (gate de validación en cada PR),
 - en el **bot** (build + control de acceso al generar los PRs a consumidores),
 - en **local** (un dev puede previsualizar).
 
+**Instalación (un único comando, auto-detecta OS y arquitectura):**
 ```bash
-# se compila una vez, corre en cualquier sitio sin instalar nada
-go build -o bin/caskai ./tools/caskai
+# Mac / Linux:
+curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+
+# Windows (PowerShell):
+irm https://raw.githubusercontent.com/jemaji/CASKAi/main/install.ps1 | iex
 ```
 
-Subcomandos: `validate` · `build` · `access` · `inventory` · `promote`.
+Los binarios pre-compilados se publican en [Releases](https://github.com/jemaji/CASKAi/releases)
+para `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64` y `windows/amd64`.
+Para compilar desde fuente (requiere Go): `go build -o ~/bin/caskai ./tools/caskai`
+
+Subcomandos: `validate` · `build` · `access` · `inventory` · `promote` · `version`.
 
 ---
 
@@ -150,11 +158,14 @@ seguridad** y para que el **bot abra PRs de actualización** a los rezagados.
 ## Cómo reproducirlo
 
 ```bash
-go build -o bin/caskai ./tools/caskai          # compilar el engine
-./bin/caskai validate                          # gate de CI
-./bin/caskai access    --manifest consumers/example-app/ai.manifest.yaml
-./bin/caskai build     --manifest consumers/payments-api/ai.manifest.yaml --out consumers/payments-api
-./bin/caskai inventory
+# 1. Instalar el engine (una sola vez)
+curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+
+# 2. Ejecutar los gates y flujos
+caskai validate
+caskai access    --manifest <consumidor>/ai.manifest.yaml
+caskai build     --manifest <consumidor>/ai.manifest.yaml --out <consumidor>/
+caskai inventory --consumers <dir-con-locks>
 ```
 
 | Requisito | Dónde se ve |
