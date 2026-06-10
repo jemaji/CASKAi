@@ -477,8 +477,15 @@ func TestCmdBuild_LockContienePack(t *testing.T) {
 
 	cmdBuild(root, manifest, out)
 	lock, _ := os.ReadFile(filepath.Join(out, "ai.lock"))
-	if !strings.Contains(string(lock), "core") {
+	s := string(lock)
+	if !strings.Contains(s, "core") {
 		t.Error("ai.lock debe referenciar el pack core")
+	}
+	if !strings.Contains(s, "engine:") {
+		t.Error("ai.lock debe incluir la versión del engine")
+	}
+	if !strings.Contains(s, "generated_at:") {
+		t.Error("ai.lock debe incluir la fecha de generación")
 	}
 }
 

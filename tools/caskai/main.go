@@ -383,13 +383,15 @@ func cmdBuild(root, manifestPath, out string) int {
 	if len(copilotCtx) > 0 {
 		mustWrite(filepath.Join(out, ".github/copilot-instructions.md"), strings.Join(copilotCtx, "\n\n"))
 	}
-	mustWrite(out+"/ai.lock", renderLock(asStr(man["channel"]), groups, lockPacks, lockHash))
+	mustWrite(out+"/ai.lock", renderLock(asStr(man["channel"]), groups, lockPacks, lockHash, version))
 	fmt.Printf("  → ai.lock + artefactos en %s\n", out)
 	return 0
 }
 
-func renderLock(channel string, groups []string, packs, hashes map[string]string) string {
+func renderLock(channel string, groups []string, packs, hashes map[string]string, engineVer string) string {
 	var b strings.Builder
+	b.WriteString("engine: " + engineVer + "\n")
+	b.WriteString("generated_at: " + time.Now().UTC().Format(time.RFC3339) + "\n")
 	b.WriteString("channel: " + channel + "\n")
 	b.WriteString("groups: [" + strings.Join(groups, ", ") + "]\n")
 	b.WriteString("packs:\n")
