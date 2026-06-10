@@ -516,9 +516,34 @@ func main() {
 			rest = append(rest, args[i])
 		}
 	}
+	printHelp := func() {
+		fmt.Printf(`caskai %s — CASKAi engine
+
+Uso:
+  caskai [--root <dir>] <comando> [opciones]
+
+Comandos:
+  validate                          Valida todos los packs (gates de CI: schema, degradación fail-closed)
+  build    --manifest <f> --out <d> Compila assets canónicos → .claude/ y .github/ para un consumidor
+  access   --manifest <f>           Muestra qué packs puede ver un consumidor según sus grupos (audita)
+  inventory --consumers <dir>       Escanea caskai.lock de todos los consumidores → trazabilidad de uso
+  promote  --asset <ruta> --to core Mueve un asset a otro pack (p. ej. domain → core)
+  version                           Muestra la versión del engine
+  help                              Muestra esta ayuda
+
+Flags globales:
+  --root <dir>   Ruta al repositorio CASKAi (por defecto: directorio actual)
+
+Ejemplos:
+  caskai validate
+  caskai build --manifest ~/consumer/caskai.yaml --out ~/consumer
+  caskai access --manifest ~/consumer/caskai.yaml
+  caskai inventory --consumers ~/consumers
+  caskai promote --asset backend-python/assets/context/x.md --to core
+`, version)
+	}
 	if len(rest) == 0 {
-		fmt.Printf("caskai %s\n", version)
-		fmt.Println("uso: caskai <validate|build|access|inventory|promote|version> [opts]")
+		printHelp()
 		os.Exit(2)
 	}
 	flag := func(name, def string) string {
@@ -542,8 +567,10 @@ func main() {
 		os.Exit(cmdPromote(root, flag("--asset", ""), flag("--to", "core")))
 	case "version":
 		fmt.Printf("caskai %s\n", version)
+	case "help", "--help", "-h":
+		printHelp()
 	default:
-		fmt.Println("comando desconocido:", rest[0])
+		fmt.Printf("comando desconocido: %s\nEjecuta 'caskai help' para ver los comandos disponibles.\n", rest[0])
 		os.Exit(2)
 	}
 }

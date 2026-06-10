@@ -4,6 +4,34 @@
 
 set -euo pipefail
 
+# ── ayuda ────────────────────────────────────────────────────
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  cat << 'EOF'
+install.sh — instalador de caskai (CASKAi engine)
+
+Uso:
+  curl -fsSL https://raw.githubusercontent.com/jemaji/CASKAi/main/install.sh | bash
+  bash install.sh [--help]
+
+Qué hace:
+  1. Detecta tu OS y arquitectura automáticamente
+  2. Descarga el binario correcto de la release más reciente de GitHub
+  3. Lo instala en ~/bin/caskai (configurable con CASKAI_INSTALL_DIR)
+  4. Añade ~/bin al PATH en tu perfil de shell si no estaba ya
+
+Variables de entorno:
+  CASKAI_INSTALL_DIR   Directorio de instalación (por defecto: ~/bin)
+
+Plataformas soportadas:
+  linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, windows/amd64
+
+Tras instalar:
+  caskai help          Ver todos los comandos disponibles
+  caskai version       Verificar la versión instalada
+EOF
+  exit 0
+fi
+
 REPO="jemaji/CASKAi"
 BIN_NAME="caskai"
 INSTALL_DIR="${CASKAI_INSTALL_DIR:-$HOME/bin}"
