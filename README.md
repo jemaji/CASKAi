@@ -42,7 +42,7 @@ go build -o bin/caskai ./tools/caskai      # compila el engine (binario único, 
 ```
 
 ## Decisiones clave
-- **Engine en Go** (binario único, sin runtime) + **rulesync** como capa de emisión multi-herramienta (ver `governance/architecture.md` ADR-10).
+- **Engine en Go** (binario único, sin runtime) con **adapters nativos** que emiten a `.claude/` y `.github/` (ver `governance/architecture.md` ADR-10). `rulesync` queda como **propuesta de futuro escalable** para cuando crezca el nº de herramientas objetivo (Fase 5).
 - **Distribución vendorizada** (ficheros en cada repo) vía **bot de PRs**; acceso aplicado en build.
 - Ver `docs/operating-model.md` (cómo funciona), `docs/security-and-access-control.md` (Entra) y `docs/flujo-e2e.md` (flujo ejecutable).
 

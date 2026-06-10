@@ -1,5 +1,0 @@
-channel: stable
-owner_groups:
-  - data-engineering
-packs:
-  - core

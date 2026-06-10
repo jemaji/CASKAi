@@ -8,8 +8,9 @@ Skills, Knowledge) servidos a Claude Code y GitHub Copilot. Este repo contiene *
 - **Pack**: bundle de assets por dominio; unidad de versionado (semver) y consumo. Vive en `packs/<pack>/`.
 - **Asset**: uno de 4 tipos canónicos (markdown + frontmatter) en `packs/<pack>/assets/`:
   - `context` → reglas/conocimiento · `command` → acción/prompt · `agent` → persona · `skill` → capacidad con recursos.
-- **Adapters/emisión**: NO se mantienen a mano. El engine compila el formato canónico a `.claude/`
-  y `.github/` delegando en **rulesync** (ADR-10). Nunca edites los ficheros generados de un consumidor.
+- **Adapters/emisión**: el engine (`caskai`) compila el formato canónico a `.claude/` y `.github/`
+  con **adapters nativos en Go** (ADR-10); `rulesync` es propuesta de futuro (Fase 5), no se usa hoy.
+  Nunca edites los ficheros generados de un consumidor: se regeneran.
 - **Distribución**: vendorizada (ficheros en cada repo) vía bot de PRs. Consumo declarado en `ai.manifest.yaml`.
 
 ## Reglas de trabajo (importantes)
@@ -46,4 +47,4 @@ python3 tools/codeowners-route.py <ficheros>   # qué owners exige CODEOWNERS
 ## Más contexto
 `governance/architecture.md` (ADRs y diseño) · `docs/operating-model.md` (flujos) ·
 `docs/security-and-access-control.md` (Entra) · `docs/flujo-e2e.md` (recorrido ejecutable) ·
-`docs/spike-rulesync-vs-rosetta.md` (decisión de emisión).
+`docs/spike-rulesync-vs-rosetta.md` (análisis de referencia; reevaluación de emisión en Fase 5).

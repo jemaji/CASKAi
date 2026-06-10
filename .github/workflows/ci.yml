@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./tools/caskai/...
+
+      - name: Test
+        run: go test ./tools/caskai/... -v -count=1
+
+      - name: Build (smoke check)
+        run: go build -o /tmp/caskai-ci ./tools/caskai
+
+      - name: Validate packs
+        run: /tmp/caskai-ci validate

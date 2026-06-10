@@ -20,6 +20,9 @@ import (
 	"time"
 )
 
+// version es sobreescrita en build release vía -ldflags "-X main.version=vX.Y.Z"
+var version = "dev"
+
 var native = map[string]map[string]bool{
 	"claude":  {"context": true, "command": true, "agent": true, "skill": true},
 	"copilot": {"context": true, "command": true, "agent": true}, // sin skill
@@ -512,7 +515,8 @@ func main() {
 		}
 	}
 	if len(rest) == 0 {
-		fmt.Println("uso: caskai <validate|build|access|inventory|promote> [opts]")
+		fmt.Printf("caskai %s\n", version)
+		fmt.Println("uso: caskai <validate|build|access|inventory|promote|version> [opts]")
 		os.Exit(2)
 	}
 	flag := func(name, def string) string {
@@ -534,6 +538,8 @@ func main() {
 		os.Exit(cmdInventory(root, flag("--consumers", filepath.Join(root, "consumers"))))
 	case "promote":
 		os.Exit(cmdPromote(root, flag("--asset", ""), flag("--to", "core")))
+	case "version":
+		fmt.Printf("caskai %s\n", version)
 	default:
 		fmt.Println("comando desconocido:", rest[0])
 		os.Exit(2)

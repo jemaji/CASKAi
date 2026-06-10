@@ -1,6 +1,0 @@
-channel: stable
-owner_groups:
-  - backend-guild      # pertenece al grupo ⇒ puede consumir backend-python (restricted)
-packs:
-  - core
-  - backend-python

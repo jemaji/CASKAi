@@ -95,21 +95,36 @@ Dos capas de mapeo:
 
 **Justificación:** Un único modelo mental, diffs revisables por PR, reproducibilidad y funcionamiento offline. Para Copilot el vendorizado es obligatorio de todos modos.
 
-### ADR-10 — Engine en Go + rulesync como capa de emisión
-**Decisión (tras spike, ver `docs/spike-rulesync-vs-rosetta.md`):** El engine (`caskai`) se
-mantiene en **Go** (binario único) y conserva la orquestación propia: validación, **acceso por
-grupo de Entra en build**, lockfile, inventario, promoción y gobernanza. La **emisión a ficheros
-nativos** (`.claude/` y `.github/`) **se delega en el binario de `rulesync`** (invocado como
-subproceso), en vez de mantener adapters propios.
+### ADR-10 — Engine en Go con adapters nativos (emisión propia)
+**Decisión:** El engine (`caskai`) se mantiene en **Go** (binario único) y **conserva toda la
+emisión a ficheros nativos** (`.claude/` y `.github/`) mediante **adapters propios** (`emitClaude`,
+`emitCopilot`), además de la orquestación: validación, **acceso por grupo de Entra en build**,
+lockfile, inventario, promoción y gobernanza. **Cero dependencias en runtime**: ni Node ni binarios
+de terceros.
 
-**Alternativas:** reescribir todo en TypeScript (rulesync nativo) — descartado para conservar el
-binario único Go y la propiedad del core; adoptar **Rosetta** como base — descartado por su
-entrega MCP-runtime/hospedada, ausencia de RBAC/telemetría y choque con perímetro+Entra (solo se
-usa como **referencia**: merge 3-capas, metodología).
+**Justificación:** Con **dos herramientas objetivo** (Claude Code + Copilot) el coste de mantener
+adapters nativos es bajo y ya está implementado. A cambio se obtiene control total sobre la
+**fidelidad de la traducción de variables**, el paso de **degradación fail-closed con mapeo**
+(ADR-5) y la integración con el **control de acceso**, sin acoplar el core a la evolución de un
+binario externo.
 
-**A cubrir por encima de rulesync** (no lo hace): **degradación fail-closed con mapeo**, traducción
-fiel de variables por herramienta, control de acceso, registro/versionado de packs, propagación
-(bot) y telemetría. rulesync distribuye binario propio → **no añade dependencia de Node en runtime**.
+**Alternativas consideradas:**
+- **Delegar la emisión en `rulesync`** (subproceso) — descartado *de momento*: con solo 2 targets el
+  ahorro es marginal y, aun delegando, habría que construir igualmente encima degradación, acceso,
+  lockfile, bot y telemetría (rulesync no lo cubre). Acopla el core a un tercero sin beneficio neto
+  a esta escala. **Se reserva como propuesta de futuro escalable** (ver §11, Fase 5): cuando el
+  número de herramientas objetivo crezca a ~4+, reevaluar rulesync como motor de emisión para no
+  mantener un adapter nativo por herramienta.
+- **Reescribir todo en TypeScript** (rulesync nativo) — descartado para conservar el binario único
+  Go y la propiedad del core.
+- **Adoptar Rosetta como base** — descartado por su entrega MCP-runtime/hospedada, ausencia de
+  RBAC/telemetría y choque con perímetro+Entra (solo se usa como **referencia**: merge 3-capas,
+  metodología).
+
+> **Nota de evolución:** una versión previa de este ADR proponía delegar la emisión en `rulesync`.
+> Se revirtió el 2026-06-10 al alinear el diseño con la implementación real del engine (adapters
+> nativos). El spike `docs/spike-rulesync-vs-rosetta.md` se conserva como análisis de referencia
+> para la reevaluación de Fase 5.
 
 ---
 
@@ -350,7 +365,7 @@ CASKAi/
 | **2 — Distribución** | `ai.manifest`/`ai.lock`, bot de PRs, vendorizado en consumidores piloto. |
 | **3 — Gobierno a escala** | Inventario de adopción, deprecation policy operativa, release trains formales. |
 | **4 — Calidad** | Evals automatizados (golden tests) en CI. |
-| **5 — Extensión** | Nuevas herramientas (Cursor, etc.) vía nuevos adapters. |
+| **5 — Extensión** | Nuevas herramientas (Cursor, etc.) vía nuevos adapters nativos. **Punto de reevaluación de `rulesync`** (ADR-10): si los targets llegan a ~4+, valorar delegar la emisión en rulesync para no mantener un adapter por herramienta. |
 
 ---
 
